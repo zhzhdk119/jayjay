@@ -1,0 +1,17 @@
+name: Public ARM installer check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: iwinv-oracle-installer
+  cancel-in-progress: false
+jobs:
+  arm:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    steps:
+      - name: Fetch public test script without credentials
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_SHA/native-check.sh" -o /tmp/native-check.sh
+          bash /tmp/native-check.sh
