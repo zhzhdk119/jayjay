@@ -28,7 +28,7 @@ test -z "$(pgrep -u prime -f '[a]gent.py run' || true)"
 echo NO_AGENT=PASS
 sudo -u prime -H google-chrome --version
 cloudflared --version
-sudo -u prime -H sh -c 'id; printf "HOME=%s XDG_CONFIG_HOME=%s CHROME_CONFIG_HOME=%s\n" "$HOME" "${XDG_CONFIG_HOME:-}" "${CHROME_CONFIG_HOME:-}"; ls -ld "$HOME" "$HOME/.config" 2>/dev/null || true; mkdir -p "$HOME/.config" "$HOME/.cache"; test -w "$HOME/.config"'
+sudo -u prime -H sh -c 'id; printf "HOME=%s XDG_CONFIG_HOME=%s CHROME_CONFIG_HOME=%s\n" "$HOME" "${XDG_CONFIG_HOME:-}" "${CHROME_CONFIG_HOME:-}"; test -w "$HOME"'
 timeout 60 sudo -u prime -H google-chrome --headless --disable-gpu --user-data-dir=/tmp/native1800-browser --dump-dom file:///opt/prime-collector/kit/start.html >/tmp/native1800-dom.html 2>/tmp/native1800-browser.log || { tail -30 /tmp/native1800-browser.log; exit 1; }
 grep -q 'self.baemin.com' /tmp/native1800-dom.html
 echo ARM_HEADLESS_LOCAL_PAGE=PASS

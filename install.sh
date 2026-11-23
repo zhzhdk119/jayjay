@@ -28,7 +28,12 @@ if [ "$DEB_ARCH" = arm64 ]; then
   PLAYWRIGHT_BROWSERS_PATH=/opt/prime-browsers /opt/prime-chromium-venv/bin/playwright install --with-deps chromium >/dev/null
   BROWSER=$(PLAYWRIGHT_BROWSERS_PATH=/opt/prime-browsers /opt/prime-chromium-venv/bin/python -c 'from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()')
   [ -x "$BROWSER" ] || { echo "ARM Chromium 실행 파일이 없어요"; exit 1; }
-  ln -sf "$BROWSER" /usr/local/bin/google-chrome
+  # sudo -H can retain the caller's XDG paths. Bind browser state to the
+  # effective user's home so prime never writes into ubuntu/runner's home.
+  WRAPPER=$(mktemp /usr/local/bin/.prime-chrome.XXXXXX)
+  printf '#!/bin/bash\nexport XDG_CONFIG_HOME="$HOME/.config"\nexport CHROME_CONFIG_HOME="$HOME/.config"\nexport XDG_CACHE_HOME="$HOME/.cache"\nexec "%s" "$@"\n' "$BROWSER" > "$WRAPPER"
+  chmod 755 "$WRAPPER"
+  mv -T "$WRAPPER" /usr/local/bin/google-chrome
   # Ubuntu 24.04 restricts user namespaces outside packaged Chrome's path.
   # Permit the sandbox for this root-owned browser only; keep the system-wide
   # restriction and Chromium sandbox enabled.
