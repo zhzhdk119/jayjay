@@ -22,7 +22,7 @@ printf 'ubuntu ALL=(ALL) NOPASSWD: ALL\n' | sudo tee /etc/sudoers.d/prime-ci-ubu
 sudo chmod 440 /etc/sudoers.d/prime-ci-ubuntu
 sudo -u ubuntu sudo -n env PRIME_INSTALL_ONLY=1 bash public/boot.sh >/tmp/native1800-install.log 2>&1 || { tail -70 /tmp/native1800-install.log; exit 1; }
 grep -E '^\[|INSTALL_ONLY|Chrom' /tmp/native1800-install.log
-test ! -e /etc/prime-collector/host_key.pem
+sudo test ! -e /etc/prime-collector/host_key.pem
 echo NO_HOST_KEY=PASS
 test -z "$(pgrep -u prime -f '[a]gent.py run' || true)"
 echo NO_AGENT=PASS
@@ -33,5 +33,5 @@ grep -q 'self.baemin.com' /tmp/native1800-dom.html
 echo ARM_HEADLESS_LOCAL_PAGE=PASS
 if sudo env PRIME_INSTALL_ONLY=invalid bash /opt/prime-collector/kit/install.sh >/tmp/invalid-mode.log 2>&1; then echo INVALID_MODE_REJECT=FAIL; exit 1; fi
 echo INVALID_MODE_REJECT=PASS
-test ! -e /etc/prime-collector/host_key.pem
+sudo test ! -e /etc/prime-collector/host_key.pem
 echo NATIVE_ARM_CHECK=PASS
